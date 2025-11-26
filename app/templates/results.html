@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Diagnostics Results</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    th { background-color: #f2f2f2; }
+    tr:nth-child(even) { background-color: #fafafa; }
+    h1 { margin-bottom: 1rem; }
+    .alert { margin-top: 2rem; padding: 1rem; background: #ffe0e0; border: 1px solid #cc0000; color: #cc0000; }
+    .unit-toggle { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Diagnostics Results</h1>
+
+  <div class="unit-toggle">
+    <form method="get" action="">
+      <label for="unit_system">Unit System:</label>
+      <select name="unit_system" id="unit_system" onchange="this.form.submit()">
+        <option value="imperial" {% if unit_system == 'imperial' %}selected{% endif %}>Imperial</option>
+        <option value="metric" {% if unit_system == 'metric' %}selected{% endif %}>Metric</option>
+      </select>
+    </form>
+  </div>
+
+  {% if results %}
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter Name</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key, value in results.items() if key != 'missing_inputs' %}
+        {% set converted, unit = convert_value_for_param(key, value, to_metric=(unit_system == 'metric')) %}
+        <tr>
+          <td>{{ parameter_names.get(key, key) }}</td>
+          <td>{{ converted }} {{ unit }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p>No results available.</p>
+  {% endif %}
+
+  {% if results.get("missing_inputs") %}
+    <div class="alert">
+      <h2>Missing Inputs</h2>
+      <ul>
+        {% for output, inputs in results.missing_inputs.items() %}
+          <li>{{ parameter_names.get(output, output) }} could not be calculated because: {{ inputs | join(', ') }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+</body>
+</html>

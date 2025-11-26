@@ -1,0 +1,75 @@
+<h3>Bit Hydraulics Results</h3>
+
+<label>
+  <input type="checkbox" id="convertUnits" onchange="applyUnitConversion()"> Convert to metric
+</label>
+
+<ul id="results-list">
+  <li data-key="A">Total Flow Area: {{ results.A }} {{ parameter_units.get("A", "in2") }}</li>
+  <li data-key="Vjet">Jet Velocity: {{ results.Vjet }} {{ parameter_units.get("Vjet", "ft/min") }}</li>
+  <li data-key="dpb">Bit Pressure Loss: {{ results.dpb }} {{ parameter_units.get("dpb", "psi") }}</li>
+  <li data-key="hydraulic_power_hp">Hydraulic Power: {{ results.hydraulic_power_hp }} {{ parameter_units.get("hydraulic_power_hp", "hp") }}</li>
+  <li data-key="PA">Power per Area: {{ results.PA }} {{ parameter_units.get("PA", "hp/in2") }}</li>
+  <li data-key="Fi">Impact Force: {{ results.Fi }} {{ parameter_units.get("Fi", "lbf") }}</li>
+</ul>
+
+<button onclick="exportAsCSV()">Export as CSV</button>
+<button onclick="exportAsJSON()">Export as JSON</button>
+
+<script>
+  // ✅ ASCII‑canonical conversion map
+  const UNIT_CONVERSIONS = {
+    "Vjet": { factor: 0.00508, unit: "m/s" },
+    "A": { factor: 645.16, unit: "mm2" }, // in2 → mm2
+    "dpb": { factor: 6.89476, unit: "kPa" }, // psi → kPa
+    "PA": { factor: 0.155, unit: "kW/m2" } // hp/in2 → kW/m2 (example)
+  };
+
+  function applyUnitConversion() {
+    const convert = document.getElementById("convertUnits").checked;
+
+    document.querySelectorAll("#results-list li").forEach(li => {
+      const key = li.getAttribute("data-key");
+      const text = li.textContent;
+      const [label, raw] = text.split(":");
+      const originalValue = parseFloat(raw) || 0;
+
+      if (convert && UNIT_CONVERSIONS[key]) {
+        const conv = UNIT_CONVERSIONS[key];
+        const newValue = (originalValue * conv.factor).toFixed(2);
+        li.textContent = `${label}: ${newValue} ${conv.unit}`;
+      } else {
+        // restore original ASCII unit
+        const unit = li.getAttribute("data-unit") || "";
+        li.textContent = `${label}: ${originalValue} ${unit}`;
+      }
+    });
+  }
+
+  function exportAsCSV() {
+    const rows = [["Metric", "Value"]];
+    document.querySelectorAll("#results-list li").forEach(li => {
+      const [label, value] = li.textContent.split(":");
+      rows.push([label.trim(), value.trim()]);
+    });
+    const csv = rows.map(r => r.join(",")).join("\n");
+    download("bit_results.csv", csv);
+  }
+
+  function exportAsJSON() {
+    const data = {};
+    document.querySelectorAll("#results-list li").forEach(li => {
+      const [label, value] = li.textContent.split(":");
+      data[label.trim()] = value.trim();
+    });
+    download("bit_results.json", JSON.stringify(data, null, 2));
+  }
+
+  function download(filename, content) {
+    const blob = new Blob([content], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  }
+</script>

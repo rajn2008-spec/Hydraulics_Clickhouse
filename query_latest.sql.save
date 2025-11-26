@@ -1,0 +1,23 @@
+CREATE TABLE diagnostics_audit (
+    run_id String,
+    timestamp DateTime,
+    source_file String,
+    status String,
+    error String
+) ENGINE = MergeTree ORDER BY timestampsql = f"""
+INSERT INTO diagnostics_results VALUES (
+    '{run_id}',
+    now(),
+    {data['velocity']}, {data['input_velocity']}, {data['normalized_velocity']},
+    {data['friction_factor']}, {data['pressure_drop']}, {data['reynolds_number']},
+    '{data['flow_regime']}',
+    {data['hydraulic_diameter']}, {data['pipe_diameter']},
+    {data['viscosity']}, {data['density']}, {data['length']},
+    CAST('{audit_raw_inputs}' AS JSON), CAST('{audit_normalized}' AS JSON)
+)
+"""
+SELECT timestamp, flow_regime, audit_raw_inputs
+FROM diagnostics_results
+ORDER BY timestamp DESC
+LIMIT 5;
+

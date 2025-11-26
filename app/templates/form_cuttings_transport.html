@@ -1,0 +1,66 @@
+<form method="POST" action="/run_cuttings_transport">
+  <fieldset>
+    <legend>Cuttings Transport Inputs</legend>
+
+    <label for="dcut">Cutting Diameter <small>(dcut, in)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="dcut" id="dcut" required>
+    <select name="dcut_unit">
+      <option value="in" selected>in</option>
+      <option value="mm">mm</option>
+    </select><br>
+
+    <label for="T">Cutting Thickness <small>(T, in)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="T" id="T" required>
+    <select name="T_unit">
+      <option value="in" selected>in</option>
+      <option value="mm">mm</option>
+    </select><br>
+
+    <label for="rho">Mud Weight <small>(rho, lb/gal)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="rho" id="rho" required>
+    <select name="rho_unit">
+      <option value="lb/gal" selected>lb/gal</option>
+      <option value="kg/m3">kg/m3</option>
+    </select><br>
+
+    <label for="k_a">Power Law k <small>(k_a, lbf/100ft2)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="k_a" id="k_a" required>
+    <select name="k_a_unit">
+      <option value="lbf/100ft2" selected>lbf/100ft2</option>
+      <option value="Pa">Pa</option>
+    </select><br>
+
+    <label for="n_a">Power Law n <small>(n_a)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="n_a" id="n_a" required><br>
+
+    <label for="Vt">Annular Velocity <small>(Vt, ft/min)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="Vt" id="Vt" required>
+    <select name="Vt_unit">
+      <option value="ft/min" selected>ft/min</option>
+      <option value="m/s">m/s</option>
+    </select><br>
+
+    <label for="ROP">Rate of Penetration <small>(ROP, ft/hr)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="ROP" id="ROP" required>
+    <select name="ROP_unit">
+      <option value="ft/hr" selected>ft/hr</option>
+      <option value="m/s">m/s</option>
+    </select><br>
+
+    <label for="dh">Hole Diameter <small>(dh, in)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="dh" id="dh" required>
+    <select name="dh_unit">
+      <option value="in" selected>in</option>
+      <option value="mm">mm</option>
+    </select><br>
+
+    <label for="Q">Flow Rate <small>(Q, gal/min)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="Q" id="Q" required>
+    <select name="Q_unit">
+      <option value="gal/min" selected>gal/min</option>
+      <option value="L/s">L/s</option>
+    </select><br>
+  </fieldset>
+
+  <button type="submit">Run Cuttings Transport</button>
+</form>

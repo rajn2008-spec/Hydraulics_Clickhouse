@@ -1,0 +1,87 @@
+<h2>Bit Hydraulics Results</h2>
+
+<label>
+  <input type="checkbox" id="convertUnits" onchange="applyUnitConversion()"> Convert to metric
+</label>
+
+<table id="resultsTable">
+  {% for key, value in results.items() %}
+    <tr>
+      <td>{{ parameter_names.get(key, key) }}</td>
+      <td data-key="{{ key }}" data-value="{{ value }}" data-unit="{{ parameter_units.get(key, '') }}">
+        {{ value }} {{ parameter_units.get(key, "") }}
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+
+<button onclick="downloadJSON()">Download JSON</button>
+<button onclick="downloadCSV()">Download CSV</button>
+
+<script>
+  // ✅ ASCII‑canonical conversion map
+  const UNIT_CONVERSIONS = {
+    "Vjet": { factor: 0.00508, unit: "m/s" },
+    "v_pipe": { factor: 0.00508, unit: "m/s" },
+    "v_ann": { factor: 0.00508, unit: "m/s" },
+    "Vs": { factor: 0.00508, unit: "m/s" },
+    "Vt": { factor: 0.00508, unit: "m/s" },
+    "ECD": { factor: 119.826, unit: "kg/m3" } // lb/gal → kg/m3
+  };
+
+  function applyUnitConversion() {
+    const convert = document.getElementById("convertUnits").checked;
+    const rows = document.querySelectorAll("#resultsTable td[data-key]");
+
+    rows.forEach(cell => {
+      const key = cell.getAttribute("data-key");
+      const originalValue = parseFloat(cell.getAttribute("data-value")) || 0;
+      const originalUnit = cell.getAttribute("data-unit") || "";
+
+      if (convert && UNIT_CONVERSIONS[key]) {
+        const conv = UNIT_CONVERSIONS[key];
+        const newValue = (originalValue * conv.factor).toFixed(2);
+        cell.textContent = `${newValue} ${conv.unit}`;
+      } else {
+        cell.textContent = `${originalValue} ${originalUnit}`;
+      }
+    });
+  }
+
+  // ✅ Export logic
+  function downloadJSON() {
+    const rows = document.querySelectorAll("#resultsTable tr");
+    const data = {};
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length === 2) {
+        data[cells[0].textContent] = cells[1].textContent;
+      }
+    });
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bit_hydraulics_results.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadCSV() {
+    const rows = document.querySelectorAll("#resultsTable tr");
+    let csv = "Parameter,Value\n";
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length === 2) {
+        csv += `"${cells[0].textContent}","${cells[1].textContent}"\n`;
+      }
+    });
+    const blob = new Blob([csv], {type: "text/csv"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bit_hydraulics_results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>

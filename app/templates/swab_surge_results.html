@@ -1,0 +1,89 @@
+<h2>Swab & Surge Results</h2>
+
+<label>
+  <input type="checkbox" id="convertUnits" onchange="applyUnitConversion()"> Convert to metric
+</label>
+
+<table id="resultsTable">
+  {% for key, value in results.items() %}
+    <tr>
+      <td>{{ parameter_names.get(key, key) }}</td>
+
+      <!-- Store original value + unit in data attributes -->
+      <td data-key="{{ key }}"
+          data-value="{{ value }}"
+          data-unit="{{ parameter_units.get(key, '') }}">
+        {{ value }} {{ parameter_units.get(key, "") }}
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+
+<button onclick="downloadJSON()">Download JSON</button>
+<button onclick="downloadCSV()">Download CSV</button>
+
+<script>
+// ✅ ASCII‑canonical conversion map
+const UNIT_CONVERSIONS = {
+  "swab_velocity": { factor: 0.00508, unit: "m/s" },   // ft/min -> m/s
+  "surge_velocity": { factor: 0.00508, unit: "m/s" },
+  "swab_pressure": { factor: 6.89476, unit: "kPa" },   // psi -> kPa
+  "surge_pressure": { factor: 6.89476, unit: "kPa" },
+  "swab_force": { factor: 4.44822, unit: "N" },        // lbf -> N
+  "surge_force": { factor: 4.44822, unit: "N" },
+  "Pg": { factor: 6.89476, unit: "kPa" }               // psi -> kPa
+};
+
+function applyUnitConversion() {
+  const convert = document.getElementById("convertUnits").checked;
+
+  document.querySelectorAll("#resultsTable td[data-key]").forEach(cell => {
+    const key = cell.getAttribute("data-key");
+    const originalValue = parseFloat(cell.getAttribute("data-value")) || 0;
+    const originalUnit = cell.getAttribute("data-unit") || "";
+
+    if (convert && UNIT_CONVERSIONS[key]) {
+      const conv = UNIT_CONVERSIONS[key];
+      const newValue = (originalValue * conv.factor).toFixed(3);
+      cell.textContent = `${newValue} ${conv.unit}`;
+    } else {
+      // ✅ Restore original ASCII‑canonical value + unit
+      cell.textContent = `${originalValue} ${originalUnit}`;
+    }
+  });
+}
+
+function downloadJSON() {
+  const data = {};
+  document.querySelectorAll("#resultsTable tr").forEach(row => {
+    const cells = row.querySelectorAll("td");
+    if (cells.length === 2) {
+      data[cells[0].innerText] = cells[1].innerText;
+    }
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "swab_surge_results.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadCSV() {
+  let csv = "Parameter,Value\n";
+  document.querySelectorAll("#resultsTable tr").forEach(row => {
+    const cells = row.querySelectorAll("td");
+    if (cells.length === 2) {
+      csv += `"${cells[0].innerText}","${cells[1].innerText}"\n`;
+    }
+  });
+  const blob = new Blob([csv], {type: "text/csv"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "swab_surge_results.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>

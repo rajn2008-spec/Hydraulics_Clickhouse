@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hydraulic Output Parameters</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+      th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+      th { background-color: #f0f0f0; }
+      h2 { margin-bottom: 1rem; }
+      a { display: inline-block; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <h2>Hydraulic Output Parameters ({{ unit_system|capitalize }} Units)</h2>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Symbol</th>
+            <th>Units</th>
+        </tr>
+
+        {% for key, label in parameter_names.items() %}
+        <tr>
+            <td>{{ label }}</td>
+            <td>{{ key }}</td>
+
+            <!-- ✅ ASCII‑canonical, safe fallback -->
+            <td>
+              {% if unit_system == "metric" %}
+                {{ metric_target_by_key.get(key, parameter_units.get(key, "")) }}
+              {% else %}
+                {{ parameter_units.get(key, "") }}
+              {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="/">Back to Unit Selection</a>
+</body>
+</html>

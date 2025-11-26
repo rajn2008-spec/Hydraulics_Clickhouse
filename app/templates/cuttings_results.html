@@ -1,0 +1,100 @@
+<h3>Cuttings Transport Results</h3>
+
+<label>
+  <input type="checkbox" id="convertUnits" onchange="applyUnitConversion()"> Convert to metric
+</label>
+
+<ul id="results-list">
+  <li data-key="gb" data-unit="{{ parameter_units.get('gb', 's^-1') }}">
+    Boundary Shear Rate: {{ results.gb }} {{ parameter_units.get("gb", "s^-1") }}
+  </li>
+
+  <li data-key="tp" data-unit="{{ parameter_units.get('tp', 'lbf/100ft2') }}">
+    Particle Shear Stress: {{ results.tp }} {{ parameter_units.get("tp", "lbf/100ft2") }}
+  </li>
+
+  <li data-key="gp" data-unit="{{ parameter_units.get('gp', 's^-1') }}">
+    Particle Shear Rate: {{ results.gp }} {{ parameter_units.get("gp", "s^-1") }}
+  </li>
+
+  <li data-key="flow_regime">
+    Flow Regime: {{ results.flow_regime }}
+  </li>
+
+  <li data-key="Vs" data-unit="{{ parameter_units.get('Vs', 'ft/min') }}">
+    Slip Velocity: {{ results.Vs }} {{ parameter_units.get("Vs", "ft/min") }}
+  </li>
+
+  <li data-key="Vt" data-unit="{{ parameter_units.get('Vt', 'ft/min') }}">
+    Transport Velocity: {{ results.Vt }} {{ parameter_units.get("Vt", "ft/min") }}
+  </li>
+
+  <li data-key="Et" data-unit="{{ parameter_units.get('Et', '%') }}">
+    Transport Efficiency: {{ results.Et }} {{ parameter_units.get("Et", "%") }}
+  </li>
+
+  <li data-key="C" data-unit="{{ parameter_units.get('C', '%') }}">
+    Cuttings Concentration: {{ results.C }} {{ parameter_units.get("C", "%") }}
+  </li>
+</ul>
+
+<button onclick="exportAsCSV()">Export as CSV</button>
+<button onclick="exportAsJSON()">Export as JSON</button>
+
+<script>
+  // ✅ ASCII‑canonical conversion map
+  const UNIT_CONVERSIONS = {
+    "Vs": { factor: 0.00508, unit: "m/s" },   // ft/min → m/s
+    "Vt": { factor: 0.00508, unit: "m/s" },   // ft/min → m/s
+    "tp": { factor: 47.88, unit: "Pa" },      // lbf/100ft2 → Pa
+    "gb": { factor: 1.0, unit: "s^-1" },      // no change, but placeholder
+    "gp": { factor: 1.0, unit: "s^-1" }
+  };
+
+  function applyUnitConversion() {
+    const convert = document.getElementById("convertUnits").checked;
+
+    document.querySelectorAll("#results-list li").forEach(li => {
+      const key = li.getAttribute("data-key");
+      const unit = li.getAttribute("data-unit") || "";
+      const text = li.textContent;
+      const [label, raw] = text.split(":");
+      const originalValue = parseFloat(raw) || 0;
+
+      if (convert && UNIT_CONVERSIONS[key]) {
+        const conv = UNIT_CONVERSIONS[key];
+        const newValue = (originalValue * conv.factor).toFixed(2);
+        li.textContent = `${label}: ${newValue} ${conv.unit}`;
+      } else {
+        li.textContent = `${label}: ${originalValue} ${unit}`;
+      }
+    });
+  }
+
+  function exportAsCSV() {
+    const rows = [["Metric", "Value"]];
+    document.querySelectorAll("#results-list li").forEach(li => {
+      const [label, value] = li.textContent.split(":");
+      rows.push([label.trim(), value.trim()]);
+    });
+    const csv = rows.map(r => r.join(",")).join("\n");
+    download("cuttings_results.csv", csv);
+  }
+
+  function exportAsJSON() {
+    const data = {};
+    document.querySelectorAll("#results-list li").forEach(li => {
+      const [label, value] = li.textContent.split(":");
+      data[label.trim()] = value.trim();
+    });
+    download("cuttings_results.json", JSON.stringify(data, null, 2));
+  }
+
+  function download(filename, content) {
+    const blob = new Blob([content], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  }
+</script>

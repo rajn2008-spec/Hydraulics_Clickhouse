@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hydraulics Diagnostics Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    form { max-width: 1000px; margin: auto; }
+    fieldset { margin-top: 1.5rem; border: 1px solid #ccc; padding: 1rem; }
+    legend { font-weight: bold; }
+    label { display: block; margin-top: 0.75rem; font-weight: bold; }
+    input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .actions { margin-top: 1rem; }
+    button { margin-top: 1rem; padding: 0.6rem 1.2rem; font-size: 1rem; }
+    .subgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+    small { font-weight: normal; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Hydraulics Diagnostics Input</h1>
+
+  <form method="POST" action="/submit">
+    <!-- Core canonical inputs -->
+    <fieldset>
+      <legend>Core inputs</legend>
+      <div class="row">
+        <div>
+          <label for="Q">Volumetric flow rate <small>(Q, gpm)</small></label>
+          <input type="number" step="any" name="Q" id="Q">
+        </div>
+        <div>
+          <label for="rho">Mud weight (base) <small>(rho, lb/gal)</small></label>
+          <input type="number" step="any" name="rho" id="rho">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="Dmd">Measured depth <small>(Dmd, ft)</small></label>
+          <input type="number" step="any" name="Dmd" id="Dmd">
+        </div>
+        <div>
+          <label for="Dtvd">True vertical depth <small>(Dtvd, ft)</small></label>
+          <input type="number" step="any" name="Dtvd" id="Dtvd">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="Dbo">Current bit depth <small>(Dbo, ft)</small></label>
+          <input type="number" step="any" name="Dbo" id="Dbo">
+        </div>
+        <div>
+          <label for="Dbp">Previous bit depth <small>(Dbp, ft)</small></label>
+          <input type="number" step="any" name="Dbp" id="Dbp">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="ROP">Rate of penetration <small>(ROP, ft/hr)</small></label>
+          <input type="number" step="any" name="ROP" id="ROP">
+        </div>
+        <div>
+          <label for="tau30">30-minute gel strength <small>(tau30, lbf/100ft2)</small></label>
+          <input type="number" step="any" name="tau30" id="tau30">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="phi600">Viscometer 600 RPM <small>(phi600)</small></label>
+          <input type="number" step="any" name="phi600" id="phi600">
+        </div>
+        <div>
+          <label for="phi300">Viscometer 300 RPM <small>(phi300)</small></label>
+          <input type="number" step="any" name="phi300" id="phi300">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="phi3">Viscometer 3 RPM <small>(phi3)</small></label>
+          <input type="number" step="any" name="phi3" id="phi3">
+        </div>
+        <div>
+          <label for="Ls">Stand length <small>(Ls, ft)</small></label>
+          <input type="number" step="any" name="Ls" id="Ls">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Geometry arrays -->
+    <fieldset>
+      <legend>Geometry - drill pipe</legend>
+      <div id="drill_pipe_container"></div>
+      <div class="actions">
+        <button type="button" onclick="addSegment('drill_pipe_container', 'drill_pipe')">Add pipe segment</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Geometry - drill collars</legend>
+      <div id="drill_collar_container"></div>
+      <div class="actions">
+        <button type="button" onclick="addSegment('drill_collar_container', 'drill_collar')">Add collar segment</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Geometry - casing</legend>
+      <div id="casing_container"></div>
+      <div class="actions">
+        <button type="button" onclick="addCasing('casing_container')">Add casing section</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Geometry - bit</legend>
+      <div id="bit_container"></div>
+      <div class="actions">
+        <button type="button" onclick="addBit('bit_container')">Add bit section</button>
+      </div>
+    </fieldset>
+
+    <!-- Mud weight profile -->
+    <fieldset>
+      <legend>Mud weight profile (depth ranges)</legend>
+      <div id="mw_profile_container"></div>
+      <div class="actions">
+        <button type="button" onclick="addMWProfile('mw_profile_container')">Add mud weight interval</button>
+      </div>
+    </fieldset>
+
+    <!-- Optional lengths -->
+    <fieldset>
+      <legend>Optional lengths</legend>
+      <div class="row">
+        <div>
+          <label for="Ldp">Drill pipe length <small>(Ldp, ft)</small></label>
+          <input type="number" step="any" name="Ldp" id="Ldp">
+        </div>
+        <div>
+          <label for="Ldc">Drill collar length <small>(Ldc, ft)</small></label>
+          <input type="number" step="any" name="Ldc" id="Ldc">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="Lc">Casing length <small>(Lc, ft)</small></label>
+          <input type="number" step="any" name="Lc" id="Lc">
+        </div>
+        <div>
+          <label for="J">Jet diameter <small>(J, in/32)</small></label>
+          <input type="number" step="any" name="J" id="J">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="dcut">Cuttings diameter <small>(dcut, in)</small></label>
+          <input type="number" step="any" name="dcut" id="dcut">
+        </div>
+        <div>
+          <label for="T">Cuttings thickness <small>(T, in)</small></label>
+          <input type="number" step="any" name="T" id="T">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="t">Time from slips to slips <small>(t, s)</small></label>
+          <input type="number" step="any" name="t" id="t">
+        </div>
+      </div>
+    </fieldset>
+
+    <button type="submit">Submit diagnostics</button>
+  </form>
+
+  <!-- Uploads -->
+  <h2>Upload Diagnostics CSV</h2>
+  <form action="/upload_diagnostics_csv" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Upload CSV</button>
+  </form>
+
+  <h2>Upload Diagnostics LAS</h2>
+  <form action="/upload_diagnostics_las" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Upload LAS</button>
+  </form>
+
+  <script>
+    // JS functions identical to your attached document (addSegment, addCasing, addBit, addMWProfile)
+  </script>
+</body>
+</html>

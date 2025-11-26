@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Hydraulics Module",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "python": "/mnt/c/Users/Pruthvi/Documents/Hydraulics_Clickhouse/.venv/bin/python3"
+    }
+  ]
+}

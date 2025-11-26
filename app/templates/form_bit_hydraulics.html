@@ -1,0 +1,94 @@
+<!-- Load from File -->
+<form method="POST" action="/preview_bit_file" enctype="multipart/form-data">
+  <label>Upload LAS/CSV File:</label>
+  <input type="file" name="data_file" accept=".csv,.las" required>
+  <button type="submit">Load from File</button>
+</form>
+
+<!-- Bit Hydraulics Form -->
+<form method="POST" action="/run_bit_hydraulics">
+  <fieldset>
+    <legend>Bit Hydraulics Inputs</legend>
+
+    <label for="Q">Flow Rate <small>(Q, gpm)</small>:</label>
+    <input type="number" name="Q" id="Q"
+           value="{{ defaults.Q if defaults else '' }}"
+           min="0.01" step="any" required><br>
+
+    <label for="rho">Mud Weight <small>(rho, lb/gal)</small>:</label>
+    <input type="number" name="rho" id="rho"
+           value="{{ defaults.rho if defaults else '' }}"
+           min="0.01" step="any" required><br>
+
+    <label for="dh">Bit OD <small>(dh, in)</small>:</label>
+    <input type="number" name="dh" id="dh"
+           value="{{ defaults.dh if defaults else '' }}"
+           min="0.01" step="any" required><br>
+
+    <label for="nozzle_count">Nozzle Count:</label>
+    <select id="nozzle_count" name="nozzle_count" onchange="updateNozzleFields()" required>
+      <option value="">Select</option>
+      {% if defaults and defaults.J %}
+        <option value="{{ defaults.J | length }}" selected>{{ defaults.J | length }}</option>
+      {% else %}
+        <option value="3">3</option>
+        <option value="4">4</option>
+      {% endif %}
+    </select><br>
+
+    <div id="nozzle_fields">
+      {% if defaults and defaults.J %}
+        {% for i in range(defaults.J | length) %}
+          <label>Jet {{ i+1 }} Diameter <small>(J, in/32)</small>:</label>
+          <input type="number" name="J[{{ i }}]"
+                 value="{{ defaults.J[i] }}"
+                 min="1" step="1" required><br>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </fieldset>
+
+  <button type="submit">Run Bit Hydraulics</button>
+</form>
+
+<script>
+function updateNozzleFields() {
+  const count = parseInt(document.getElementById("nozzle_count").value);
+  const container = document.getElementById("nozzle_fields");
+  container.innerHTML = "";
+
+  for (let i = 0; i < count; i++) {
+    const label = document.createElement("label");
+    label.innerHTML = `Jet ${i+1} Diameter <small>(J, in/32)</small>:`;
+
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = "1";
+    input.step = "1";
+    input.name = `J[${i}]`;
+    input.required = true;
+
+    container.appendChild(label);
+    container.appendChild(input);
+    container.appendChild(document.createElement("br"));
+  }
+}
+
+document.querySelector("form[action='/run_bit_hydraulics']")
+  .addEventListener("submit", function(e) {
+    const count = parseInt(document.getElementById("nozzle_count").value);
+    let valid = true;
+
+    for (let i = 0; i < count; i++) {
+      const input = document.querySelector(`input[name="J[${i}]"]`);
+      if (!input || input.value === "" || parseFloat(input.value) <= 0) {
+        valid = false;
+      }
+    }
+
+    if (!valid) {
+      e.preventDefault();
+      alert("Please enter all nozzle diameters (positive values).");
+    }
+});
+</script>

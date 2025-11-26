@@ -1,0 +1,21 @@
+CREATE TABLE diagnostics (
+    well_id String,
+    input_pressure_si Float64,
+    output_pressure_si Float64,
+    flow_rate_si Float64,
+    fluid_type String,
+    unit_map String,
+    notes String,
+    current_depth Float64,
+    pipe_od Float64,
+    casing_od Float64,
+    collar_od Float64,
+    bit_od Float64,
+    velocity_annulus Float64,
+    n_s Float64,
+    k_s Float64,
+    n_a Float64,
+    k_a Float64
+) ENGINE = MergeTree()
+ORDER BY well_id;
+

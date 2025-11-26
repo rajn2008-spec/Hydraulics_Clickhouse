@@ -1,0 +1,49 @@
+<form method="POST" action="/run_swab_surge">
+  <fieldset>
+    <legend>Swab & Surge Inputs</legend>
+
+    <label for="Ls">Stand Length <small>(Ls, ft)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="Ls" id="Ls" required><br>
+
+    <label for="t">Time from Slips to Slips <small>(t, s)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="t" id="t" required><br>
+
+    <label for="d1">Drill Pipe OD <small>(d1, in)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="d1" id="d1" required><br>
+
+    <label for="d2">Casing/Bit OD <small>(d2, in)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="d2" id="d2" required><br>
+
+    <label for="rho">Mud Weight <small>(rho, lb/gal)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="rho" id="rho" required><br>
+
+    <label for="k_a">Power Law k <small>(k_a, lbf/100ft2)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="k_a" id="k_a" required><br>
+
+    <label for="n_a">Power Law n <small>(n_a)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="n_a" id="n_a" required><br>
+
+    <label for="Lc">Casing Length <small>(Lc, ft)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="Lc" id="Lc" required><br>
+
+    <label for="Ldp">Drill Pipe Length <small>(Ldp, ft)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="Ldp" id="Ldp" required><br>
+
+    <label for="Ldc">Drill Collar Length <small>(Ldc, ft)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="Ldc" id="Ldc" required><br>
+
+    <label for="gel_dpc">Gel Strength DP-Casing <small>(lbf/100ft2)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="gel_dpc" id="gel_dpc" required><br>
+
+    <label for="gel_dph">Gel Strength DP-Open Hole <small>(lbf/100ft2)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="gel_dph" id="gel_dph" required><br>
+
+    <label for="gel_dch">Gel Strength DC-Open Hole <small>(lbf/100ft2)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="gel_dch" id="gel_dch" required><br>
+
+    <label for="Dtvd">True Vertical Depth <small>(Dtvd, ft)</small>:</label>
+    <input type="number" step="0.01" min="0.01" name="Dtvd" id="Dtvd" required><br>
+  </fieldset>
+
+  <button type="submit">Run Swab & Surge</button>
+</form>
